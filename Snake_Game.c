@@ -21,7 +21,7 @@ void obstacle(int obs) {
   scanf("%d", &per);
 
   int min = 0, max = SIZE - 1, r, c, i = 0;
-  for (; i < (( 0.1*per) / 100.0) * SIZE * SIZE; i++) {
+  for (; i < ( per / 100.0) * SIZE * SIZE; i++) {
   generate_obs:
     r = min + rand() % (max + 1), c = min + rand() % (max + 1);
     if (r == 0 && c == 0)
