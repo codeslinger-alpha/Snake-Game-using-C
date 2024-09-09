@@ -4,33 +4,34 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
-#define SIZE 25
-char *OBS[SIZE*SIZE];
+#define SIZE 20
+char *OBS[SIZE * SIZE];
 int wait_time_ms = 100;
 char area[SIZE][SIZE];
 char prev = 'd';
 char *snake[SIZE * SIZE];
-char pointr = -1, pointc = -1;
+int pointr = -1, pointc = -1;
 int snakelen = 1;
-int num_of_obs=0;
+int num_of_obs = 0;
 void obstacle(int obs) {
   if (!obs)
     return;
   printf("Percentage of obstacle(1-50%%): ");
   int per;
-  scanf("%d",&per);
+  scanf("%d", &per);
 
-  int min = 0, max = SIZE - 1, r, c,i=0;
-for(;i<(per/100.0)*SIZE*SIZE;i++){
-generate_obs:
-  r = min + rand() % (max + 1), c = min + rand() % (max + 1);
-  if(r==0 && c==0) goto generate_obs;
-    if(area[r][c]=='X') goto generate_obs;
-    OBS[i]=&area[r][c];
+  int min = 0, max = SIZE - 1, r, c, i = 0;
+  for (; i < (( 0.1*per) / 100.0) * SIZE * SIZE; i++) {
+  generate_obs:
+    r = min + rand() % (max + 1), c = min + rand() % (max + 1);
+    if (r == 0 && c == 0)
+      goto generate_obs;
+    if (area[r][c] == 'X')
+      goto generate_obs;
+    OBS[i] = &area[r][c];
   }
-  num_of_obs=i;
+  num_of_obs = i;
 }
-
 
 void set_input_mode(int enabled) {
   static struct termios oldt, newt;
@@ -65,13 +66,14 @@ void spawn() {
     int min = 0, max = SIZE - 1, r, c;
   generate:
     r = min + rand() % (max + 1), c = min + rand() % (max + 1);
-    
+
     for (int i = 0; i < snakelen; i++) {
-      if (snake[i] == &area[r][c] )
+      if (snake[i] == &area[r][c])
         goto generate;
     }
-    for(int i=0;i<num_of_obs;i++){
-      if(OBS[i]==&area[r][c]) goto generate;
+    for (int i = 0; i < num_of_obs; i++) {
+      if (OBS[i] == &area[r][c])
+        goto generate;
     }
     pointr = r;
     pointc = c;
@@ -140,12 +142,12 @@ chk:
 }
 
 void clear() {
-  
+
   for (int i = 1; i <= SIZE; i++) {
     printf("\033[A");
     printf("\033[2K");
   }
-   //system("clear");
+  // system("clear");
   memset(area, ' ', sizeof(area));
 }
 
@@ -171,8 +173,9 @@ int check(char *past, int obs) {
     if (snake[0] == snake[i])
       return -1;
   }
-  for(int i=0;i<num_of_obs;i++){
-    if(OBS[i]==snake[0] ) return -1;
+  for (int i = 0; i < num_of_obs; i++) {
+    if (OBS[i] == snake[0])
+      return -1;
   }
   if (snake[0] == &area[pointr][pointc])
     return 1;
@@ -198,18 +201,18 @@ void move(int eaten, char *past) {
 }
 
 void print() {
-  int o=0;
+  int o = 0;
   for (int r = 0; r < SIZE; r++) {
-    for (int c = 0; c < SIZE; c++){
-      for(int i=0;i<num_of_obs;i++){
-        if(OBS[i]==&area[r][c]){ 
+    for (int c = 0; c < SIZE; c++) {
+      for (int i = 0; i < num_of_obs; i++) {
+        if (OBS[i] == &area[r][c]) {
           printf("\033[45m\033[32mX\033[0m");
-          o=1;
+          o = 1;
           break;
-        }  
+        }
       }
-      if(o){
-        o=0;
+      if (o) {
+        o = 0;
         continue;
       }
       printf("\033[45m\033[32m%c\033[0m", area[r][c]);
@@ -236,14 +239,14 @@ int main() {
   usleep(1000000);
   set_input_mode(1);
   srand(time(NULL));
-  
+
   while (1) {
 
     print();
     char *past = dir(); // takes time
     clear();
     spawn();
-    int c = check(past,obs), eaten = 0;
+    int c = check(past, obs), eaten = 0;
     if (c == -1)
       break;
     else if (c == 1)
@@ -255,9 +258,9 @@ int main() {
 
   system("clear");
   printf("\033[1mGAME OVER\033[0m\n");
-  
+
   usleep(2000000);
-  printf("\nScore: %d\n", snakelen-1);
+  printf("\nScore: %d\n", snakelen - 1);
 
   return 0;
 }
