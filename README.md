@@ -23,6 +23,6 @@ all keys are in **lowercase**
 **Border wrapping**  
 ![image](https://github.com/user-attachments/assets/63a1ca6c-6770-4968-a0b5-cce786c88f1d)  
 **Video**  
-[Demo video](https://github.com/user-attachments/assets/589329ca-36cc-453e-8c1e-15bf73baf196)
+https://github.com/user-attachments/assets/589329ca-36cc-453e-8c1e-15bf73baf196
 
 
