@@ -14,7 +14,7 @@ All keys are in **lowercase**
 -change wait_time_ms to change frame speed  
 -**you can change snake design also**  
 ### After running the program  
--Select level(speed)
+-Select level(speed)  
 -You can set boundary walls  
 -Set obstacles randomly  
 # Demo  
