@@ -9,6 +9,7 @@
 #define ROW 15
 #define COL 50
 const char snake_body = '=', point = 'o', OBSTACLE = '#'; // Visuals
+int border_wall;
 
 char *OBS[ROW * COL];
 int wait_time_ms = 100;
@@ -18,7 +19,7 @@ char *snake[ROW * COL];
 int pointr = -1, pointc = -1;
 int snakelen = 1;
 int num_of_obs = 0;
-int getch() ;
+int getch();
 void set_input_mode(int enabled);
 int kbhit();
 void obstacle(int obs) {
@@ -61,7 +62,7 @@ void spawn() {
 }
 
 char wait(int ms) {
-  if(ms==-1){
+  if (ms == -1) {
     return getch();
   }
   int elps = 0;
@@ -76,12 +77,13 @@ char wait(int ms) {
 }
 
 char *dir() {
-  char ch; 
-unpaused:  ch = wait(wait_time_ms);
-  
-  if(ch==' ') 
-  {
-    while((ch=wait(-1))!=' ' );
+  char ch;
+unpaused:
+  ch = wait(wait_time_ms);
+
+  if (ch == ' ') {
+    while ((ch = wait(-1)) != ' ')
+      ;
     goto unpaused;
   }
   if (!ch || !(ch == 'd' || ch == 'a' || ch == 'w' || ch == 's'))
@@ -89,7 +91,7 @@ unpaused:  ch = wait(wait_time_ms);
 
 chk:
   switch (ch) {
-  case 'd'://right
+  case 'd': // right
     if (snakelen == 1 || (snake[0] + 1) != snake[1]) {
       snake[0]++;
       prev = ch;
@@ -98,7 +100,7 @@ chk:
       ch = prev;
       goto chk;
     }
-  case 'a'://left
+  case 'a': // left
     if (snakelen == 1 || snake[0] - 1 != snake[1]) {
       snake[0]--;
       prev = ch;
@@ -108,7 +110,7 @@ chk:
       goto chk;
     }
 
-  case 'w'://up
+  case 'w': // up
     if (snakelen == 1 || snake[0] - COL != snake[1]) {
       snake[0] -= COL;
       prev = ch;
@@ -118,7 +120,7 @@ chk:
       goto chk;
     }
 
-  case 's'://down
+  case 's': // down
     if (snakelen == 1 || snake[0] + COL != snake[1]) {
       snake[0] += COL;
       prev = ch;
@@ -131,35 +133,56 @@ chk:
 }
 
 void clear() {
-  char buff[(sizeof("\033[A\033[2K")+5)*(ROW+1)];
-  int size_of_buff=0;
+  char buff[(sizeof("\033[A\033[2K") + 5) * (ROW + 1)];
+  int size_of_buff = 0;
 
-  for (int i = 1; i <= ROW+1; i++) {
-    size_of_buff+=sprintf(buff+size_of_buff,"\033[A");//move cursor up by 1 row
-    size_of_buff+=printf(buff+size_of_buff,"\033[2K");//clear entire row
+  for (int i = 1; i <= ROW + 1; i++) {
+    size_of_buff +=
+        sprintf(buff + size_of_buff, "\033[A"); // move cursor up by 1 row
+    size_of_buff += printf(buff + size_of_buff, "\033[2K"); // clear entire row
   }
-  printf("%s",buff);
+  printf("%s", buff);
   memset(area, ' ', sizeof(area));
 }
 
 int check(char *past, int obs) {
   // Border checking
-  int row = (snake[0] - &area[0][0]) / COL,
-      col = (snake[0] - &area[0][0]) % COL;
-  int p_col = (past - &area[0][0]) % COL;
-  if (p_col == COL - 1 && col == 0)
-    snake[0] -= COL;
-  else if (p_col == 0 && (col < 0 || col == COL - 1))
-    snake[0] += COL;
-  else {
-    if (snake[0] < &area[0][0])
-      row = ROW;
-    else if (row >= ROW)
-      row = 0;
+  if (border_wall) {
+    int row = (snake[0] - &area[0][0]) / COL,
+        col = (snake[0] - &area[0][0]) % COL;
+    int p_col = (past - &area[0][0]) % COL;
+    if (p_col == COL - 1 && col == 0)
+      return -1;
+    else if (p_col == 0 && (col < 0 || col == COL - 1))
+      return -1;
 
-    snake[0] = &area[row][col];
+    
+
+    
+      else if (snake[0] < &area[0][0])
+        return -1;
+      else if (row >= ROW)
+        return -1;
+      
+      
+    
+  } else {
+    int row = (snake[0] - &area[0][0]) / COL,
+        col = (snake[0] - &area[0][0]) % COL;
+    int p_col = (past - &area[0][0]) % COL;
+    if (p_col == COL - 1 && col == 0)
+      snake[0] -= COL;
+    else if (p_col == 0 && (col < 0 || col == COL - 1))
+      snake[0] += COL;
+    else {
+      if (snake[0] < &area[0][0])
+        row = ROW;
+      else if (row >= ROW)
+        row = 0;
+
+      snake[0] = &area[row][col];
+    }
   }
-
   for (int i = 2; i < snakelen; i++) {
     if (snake[0] == snake[i])
       return -1;
@@ -177,7 +200,7 @@ int check(char *past, int obs) {
 
 void move(int eaten, char *past) {
   int i = 1;
-  //head design
+  // head design
   if (prev == 'd')
     (*snake[0]) = '>';
   else if (prev == 'a')
@@ -208,9 +231,8 @@ void print() {
 
   for (int r = 0; r < ROW; r++) {
     for (int c = 0; c < COL; c++) {
-      if(bgcolor)
-      printf("\033[48;5;155m");
-
+      if (bgcolor)
+        printf("\033[48;5;155m");
 
       for (int i = 0; i < num_of_obs; i++) {
         if (OBS[i] == &area[r][c]) {
@@ -227,7 +249,7 @@ void print() {
         printf("\033[0m");
         continue;
       }
-      printf("\033[30m%c", area[r][c]);  
+      printf("\033[30m%c", area[r][c]);
 
       printf("\033[0m");
     }
@@ -236,12 +258,11 @@ void print() {
   }
 
   printf("\033[0m");
- printf("Score: %d\n", snakelen - 1);
+  printf("Score: %d\n", snakelen - 1);
 }
 
-
 int main() {
- start: 
+start:
   snake[0] = &area[0][0];
   memset(area, ' ', sizeof(area));
   printf("Level(1-10): ");
@@ -256,7 +277,9 @@ int main() {
 
   scanf("%hd", &obs);
   obstacle(obs);
-  printf("\033[?25l");//hide cursor
+  printf("Enable border wall(1/0): ");
+  scanf("%d",&border_wall);
+  printf("\033[?25l"); // hide cursor
   fflush(stdout);
   printf("Use w/a/s/d for controls. Press <space> to pause/unpause\n");
   usleep(1000000);
@@ -292,10 +315,9 @@ int main() {
 
   printf("\nScore: %d\n", snakelen - 1);
   usleep(500000);
-  printf("\033[?25h");//show cursor
+  printf("\033[?25h"); // show cursor
 
   return 0;
-
 }
 void set_input_mode(int enabled) {
   static struct termios oldt, newt;
