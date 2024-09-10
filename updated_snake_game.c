@@ -133,10 +133,10 @@ chk:
 }
 
 void clear() {
-  char buff[(sizeof("\033[A\033[2K") + 5) * (ROW + 1)];
+  char buff[(sizeof("\033[A\033[2K") + 5) * (ROW + 5)];
   int size_of_buff = 0;
 
-  for (int i = 1; i <= ROW + 1; i++) {
+  for (int i = 1; i <= ROW + 1 + border_wall; i++) {
     size_of_buff +=
         sprintf(buff + size_of_buff, "\033[A"); // move cursor up by 1 row
     size_of_buff += printf(buff + size_of_buff, "\033[2K"); // clear entire row
@@ -156,16 +156,11 @@ int check(char *past, int obs) {
     else if (p_col == 0 && (col < 0 || col == COL - 1))
       return -1;
 
-    
+    else if (snake[0] < &area[0][0])
+      return -1;
+    else if (row >= ROW)
+      return -1;
 
-    
-      else if (snake[0] < &area[0][0])
-        return -1;
-      else if (row >= ROW)
-        return -1;
-      
-      
-    
   } else {
     int row = (snake[0] - &area[0][0]) / COL,
         col = (snake[0] - &area[0][0]) % COL;
@@ -230,6 +225,8 @@ void print() {
   int obstacles = 0;
 
   for (int r = 0; r < ROW; r++) {
+    if (border_wall)
+      printf("|");
     for (int c = 0; c < COL; c++) {
       if (bgcolor)
         printf("\033[48;5;155m");
@@ -253,11 +250,17 @@ void print() {
 
       printf("\033[0m");
     }
-
+    if (border_wall)
+      printf("|");
     printf("\n");
   }
 
   printf("\033[0m");
+  if (border_wall) {
+    for (int i = 0; i < COL + 2; i++)
+      printf("-");
+    puts("");
+  }
   printf("Score: %d\n", snakelen - 1);
 }
 
@@ -278,13 +281,20 @@ start:
   scanf("%hd", &obs);
   obstacle(obs);
   printf("Enable border wall(1/0): ");
-  scanf("%d",&border_wall);
+  scanf("%d", &border_wall);
+
   printf("\033[?25l"); // hide cursor
   fflush(stdout);
   printf("Use w/a/s/d for controls. Press <space> to pause/unpause\n");
   usleep(1000000);
   set_input_mode(1);
   srand(time(NULL));
+  if (border_wall) {
+    border_wall = 1;
+    for (int i = 0; i < COL + 2; i++)
+      printf("_");
+    puts("");
+  }
 
   while (1) {
 
