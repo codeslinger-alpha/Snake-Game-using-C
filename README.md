@@ -1,6 +1,6 @@
 **Implementation of a basic snake game🐍, using pointers and 2D array.**  
 # Controls  
-All keys are in **lowercase**  
+Keys are **not case-sensitive**   
 **w**=up  
 **a**=left  
 **s**=down  
@@ -9,14 +9,24 @@ All keys are in **lowercase**
 # Features  
 **Border wrapping**
 ### In the *source code*  
--change ROW and COL to change the area  
--set *bgcolor* to 1 or 0 to turn the background colour on or off  
--change wait_time_ms to change frame speed  
+```c
+#define bgcolor 1
+#define ROW 15
+#define COL 30
+int wait_time_ms=1000;//This is the maximum value
+int border_wall;
+char prev = 'd'; // primary direction of movement
+```
+-change `ROW` and `COL` to change the area  
+-set `bgcolor` to 1 or 0 to turn the background colour on or off  
+-change `wait_time_ms` to change frame speed  
+-change `prev` to change the direction in which the snake starts moving  
 -**you can change snake design also**  
 ### After running the program  
 -Select level(speed)  
 -You can set boundary walls  
 -Set obstacles randomly  
+-Beep sound will play if you eat a point or when it's game over🎮  
 # Demo  
 ## Screenshots 
 **Boundary**  
@@ -25,8 +35,10 @@ All keys are in **lowercase**
 ![image](https://github.com/user-attachments/assets/63a1ca6c-6770-4968-a0b5-cce786c88f1d)  
 ## Output    
 <p align="left">
-  <img src="https://github.com/user-attachments/assets/885c5014-15a0-412f-bf7f-98d7c1f9aeaf" alt="gameplay" width="500" height="300">
+  <img src="https://github.com/user-attachments/assets/23b39816-a0f8-4021-9ad1-39890a3f21b6" alt="gameplay">
 </p> 
+
+
 
 
 
