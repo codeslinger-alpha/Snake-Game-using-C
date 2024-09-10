@@ -1,11 +1,11 @@
 **Implementation of a basic snake game🐍, using pointers and 2D array.**  
 # Controls  
 Keys are **not case-sensitive**   
-**w**=up  
-**a**=left  
-**s**=down  
-**d**=right  
-**space**=pause/unpause  
+`w`=up  
+`a`=left  
+`s`=down  
+`d`=right  
+`space`=pause/unpause  
 # Features  
 **Border wrapping**
 ### In the *source code*  
