@@ -1,6 +1,6 @@
 **Implementation of a basic snake game🐍, using pointers and 2D array.**  
 # Controls  
-all keys are in **lowercase**  
+All keys are in **lowercase**  
 **w**=up  
 **a**=left  
 **s**=down  
@@ -8,12 +8,13 @@ all keys are in **lowercase**
 **space**=pause/unpause  
 # Features  
 **Border wrapping**
-### in the *source code*  
+### In the *source code*  
 -change ROW and COL to change the area  
 -set *bgcolor* to 1 or 0 to turn the background colour on or off  
 -change wait_time_ms to change frame speed  
--**You can change snake design also**  
+-**you can change snake design also**  
 ### After running the program  
+-Select level(speed)
 -You can set boundary walls  
 -Set obstacles randomly  
 # Demo  
