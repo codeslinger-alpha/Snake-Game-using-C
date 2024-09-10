@@ -23,7 +23,10 @@ All keys are in **lowercase**
 ![image](https://github.com/user-attachments/assets/887853fe-74a2-47b1-8c2a-3c1d0fb2f68b)  
 **Border wrapping**  
 ![image](https://github.com/user-attachments/assets/63a1ca6c-6770-4968-a0b5-cce786c88f1d)  
-**Video**  
-https://github.com/user-attachments/assets/589329ca-36cc-453e-8c1e-15bf73baf196
+## Output    
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/5354cbf6-b237-4e76-8a03-88f886d01ce0" alt="gameplay"  height="300" width="600">
+</p> 
+
 
 
