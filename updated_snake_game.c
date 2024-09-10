@@ -7,12 +7,14 @@
 #include <unistd.h>
 #define bgcolor 1
 #define ROW 15
-#define COL 50
-const char snake_body = '=', point = 'o', OBSTACLE = '#'; // Visuals
+#define COL 30
+int wait_time_ms = 100;
 int border_wall;
+const char snake_body = '=', point = 'o', OBSTACLE = '#'; // Visuals
+
 
 char *OBS[ROW * COL];
-int wait_time_ms = 100;
+
 char area[ROW][COL];
 char prev = 'd'; // primary direction of movement
 char *snake[ROW * COL];
@@ -258,7 +260,7 @@ void print() {
   printf("\033[0m");
   if (border_wall) {
     for (int i = 0; i < COL + 2; i++)
-      printf("-");
+      printf("|");
     puts("");
   }
   printf("Score: %d\n", snakelen - 1);
@@ -292,7 +294,7 @@ start:
   if (border_wall) {
     border_wall = 1;
     for (int i = 0; i < COL + 2; i++)
-      printf("_");
+      printf("|");
     puts("");
   }
 
