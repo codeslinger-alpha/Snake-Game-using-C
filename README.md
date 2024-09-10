@@ -25,7 +25,7 @@ All keys are in **lowercase**
 ![image](https://github.com/user-attachments/assets/63a1ca6c-6770-4968-a0b5-cce786c88f1d)  
 ## Output    
 <p align="left">
-  <img src="https://github.com/user-attachments/assets/5354cbf6-b237-4e76-8a03-88f886d01ce0" alt="gameplay"  height="300" width="600">
+  <img src="https://github.com/user-attachments/assets/885c5014-15a0-412f-bf7f-98d7c1f9aeaf" alt="gameplay" width="500" height="300">
 </p> 
 
 
