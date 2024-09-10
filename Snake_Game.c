@@ -61,6 +61,9 @@ void spawn() {
 }
 
 char wait(int ms) {
+  if(ms==-1){
+    return getch();
+  }
   int elps = 0;
   while (elps < ms) {
     if (kbhit())
@@ -73,7 +76,14 @@ char wait(int ms) {
 }
 
 char *dir() {
-  char ch = wait(wait_time_ms);
+  char ch; 
+unpaused:  ch = wait(wait_time_ms);
+  
+  if(ch==' ') 
+  {
+    while((ch=wait(-1))!=' ' );
+    goto unpaused;
+  }
   if (!ch || !(ch == 'd' || ch == 'a' || ch == 'w' || ch == 's'))
     ch = prev;
 
@@ -123,7 +133,7 @@ chk:
 void clear() {
   char buff[(sizeof("\033[A\033[2K")+5)*(ROW+1)];
   int size_of_buff=0;
-  
+
   for (int i = 1; i <= ROW+1; i++) {
     size_of_buff+=sprintf(buff+size_of_buff,"\033[A");//move cursor up by 1 row
     size_of_buff+=printf(buff+size_of_buff,"\033[2K");//clear entire row
@@ -195,16 +205,16 @@ void move(int eaten, char *past) {
 
 void print() {
   int obstacles = 0;
-  
+
   for (int r = 0; r < ROW; r++) {
     for (int c = 0; c < COL; c++) {
       if(bgcolor)
       printf("\033[48;5;155m");
 
-      
+
       for (int i = 0; i < num_of_obs; i++) {
         if (OBS[i] == &area[r][c]) {
-          
+
           printf("\033[38;5;196m%c", OBSTACLE);
           obstacles = 1;
           break;
@@ -213,7 +223,7 @@ void print() {
 
       if (obstacles) {
         obstacles = 0;
-        
+
         printf("\033[0m");
         continue;
       }
@@ -221,10 +231,10 @@ void print() {
 
       printf("\033[0m");
     }
-    
+
     printf("\n");
   }
- 
+
   printf("\033[0m");
  printf("Score: %d\n", snakelen - 1);
 }
@@ -243,16 +253,16 @@ int main() {
   wait_time_ms *= (11 - level);
   printf("Do you want obstacles?(1/0): ");
   short int obs;
-  
+
   scanf("%hd", &obs);
   obstacle(obs);
   printf("\033[?25l");//hide cursor
   fflush(stdout);
-  printf("Use w/a/s/d for controls\n");
+  printf("Use w/a/s/d for controls. Press <space> to pause/unpause\n");
   usleep(1000000);
   set_input_mode(1);
   srand(time(NULL));
- 
+
   while (1) {
 
     print();
@@ -268,24 +278,24 @@ int main() {
   }
 
   set_input_mode(0);
-  
+
   printf("\a\a\a");
   usleep(1000000);
   printf("\a\a\a");
   usleep(1000000);
   printf("\a\a\a");
-  
+
   system("clear");
   printf("\033[1mGAME OVER\033[0m\n");
 
   usleep(2000000);
-  
+
   printf("\nScore: %d\n", snakelen - 1);
   usleep(500000);
   printf("\033[?25h");//show cursor
-  
+
   return 0;
-  
+
 }
 void set_input_mode(int enabled) {
   static struct termios oldt, newt;
