@@ -16,6 +16,7 @@ Keys are **not case-sensitive**
 int wait_time_ms=1000;//This is the maximum value
 int border_wall;
 char prev = 'd'; // primary direction of movement
+const char snake_body = '=', point = 'o', OBSTACLE = '#'; // Visuals
 ```
 -change `ROW` and `COL` to change the area  
 -set `bgcolor` to 1 or 0 to turn the background colour on or off  
