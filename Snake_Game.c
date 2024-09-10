@@ -5,18 +5,22 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
-
-#define SIZE 15
+#define bgcolor 1
+#define ROW 15
+#define COL 50
 const char snake_body = '=', point = 'o', OBSTACLE = '#'; // Visuals
 
-char *OBS[SIZE * SIZE];
+char *OBS[ROW * COL];
 int wait_time_ms = 100;
-char area[SIZE][SIZE];
-char prev = 'd';
-char *snake[SIZE * SIZE];
+char area[ROW][COL];
+char prev = 'd'; // primary direction of movement
+char *snake[ROW * COL];
 int pointr = -1, pointc = -1;
 int snakelen = 1;
 int num_of_obs = 0;
+int getch() ;
+void set_input_mode(int enabled);
+int kbhit();
 void obstacle(int obs) {
   if (!obs)
     return;
@@ -24,10 +28,10 @@ void obstacle(int obs) {
   int per;
   scanf("%d", &per);
 
-  int min = 0, max = SIZE - 1, r, c, i = 0;
-  for (; i < (per / 100.0) * SIZE * SIZE; i++) {
+  int min = 0, maxR = ROW - 1, maxC = COL - 1, r, c, i = 0;
+  for (; i < (per / 100.0) * ROW * COL; i++) {
   generate_obs:
-    r = min + rand() % (max + 1), c = min + rand() % (max + 1);
+    r = min + rand() % (maxR + 1), c = min + rand() % (maxC + 1);
     if (r == 0 && c == 0)
       goto generate_obs;
     if (area[r][c] == OBSTACLE)
@@ -36,38 +40,11 @@ void obstacle(int obs) {
   }
   num_of_obs = i;
 }
-
-void set_input_mode(int enabled) {
-  static struct termios oldt, newt;
-  if (enabled) {
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  } else {
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  }
-}
-
-int kbhit() {
-  struct timeval tv = {0L, 0L};
-  fd_set fds;
-  FD_ZERO(&fds);
-  FD_SET(STDIN_FILENO, &fds);
-  return select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
-}
-
-int getch() {
-  int ch;
-  ch = getchar();
-  return ch;
-}
-
 void spawn() {
   if (pointr == -1) {
-    int min = 0, max = SIZE - 1, r, c;
+    int min = 0, maxR = ROW - 1, maxC = COL - 1, r, c;
   generate:
-    r = min + rand() % (max + 1), c = min + rand() % (max + 1);
+    r = min + rand() % (maxR + 1), c = min + rand() % (maxC + 1);
 
     for (int i = 0; i < snakelen; i++) {
       if (snake[i] == &area[r][c])
@@ -89,8 +66,8 @@ char wait(int ms) {
     if (kbhit())
       return getch();
     else
-      usleep(7000);
-    elps += 7;
+      usleep(2000);
+    elps += 2;
   }
   return 0;
 }
@@ -102,7 +79,7 @@ char *dir() {
 
 chk:
   switch (ch) {
-  case 'd':
+  case 'd'://right
     if (snakelen == 1 || (snake[0] + 1) != snake[1]) {
       snake[0]++;
       prev = ch;
@@ -111,7 +88,7 @@ chk:
       ch = prev;
       goto chk;
     }
-  case 'a':
+  case 'a'://left
     if (snakelen == 1 || snake[0] - 1 != snake[1]) {
       snake[0]--;
       prev = ch;
@@ -121,21 +98,21 @@ chk:
       goto chk;
     }
 
-  case 'w':
-    if (snakelen == 1 || snake[0] - SIZE != snake[1]) {
-      snake[0] -= SIZE;
+  case 'w'://up
+    if (snakelen == 1 || snake[0] - COL != snake[1]) {
+      snake[0] -= COL;
       prev = ch;
-      return snake[0] + SIZE;
+      return snake[0] + COL;
     } else {
       ch = prev;
       goto chk;
     }
 
-  case 's':
-    if (snakelen == 1 || snake[0] + SIZE != snake[1]) {
-      snake[0] += SIZE;
+  case 's'://down
+    if (snakelen == 1 || snake[0] + COL != snake[1]) {
+      snake[0] += COL;
       prev = ch;
-      return snake[0] - SIZE;
+      return snake[0] - COL;
     } else {
       ch = prev;
       goto chk;
@@ -144,28 +121,30 @@ chk:
 }
 
 void clear() {
-
-  for (int i = 1; i <= SIZE; i++) {
-    printf("\033[A");
-    printf("\033[2K");
+  char buff[(sizeof("\033[A\033[2K")+5)*(ROW+1)];
+  int size_of_buff=0;
+  
+  for (int i = 1; i <= ROW+1; i++) {
+    size_of_buff+=sprintf(buff+size_of_buff,"\033[A");//move cursor up by 1 row
+    size_of_buff+=printf(buff+size_of_buff,"\033[2K");//clear entire row
   }
-  // system("clear");
+  printf("%s",buff);
   memset(area, ' ', sizeof(area));
 }
 
 int check(char *past, int obs) {
   // Border checking
-  int row = (snake[0] - &area[0][0]) / SIZE,
-      col = (snake[0] - &area[0][0]) % SIZE;
-  int p_col = (past - &area[0][0]) % SIZE;
-  if (p_col == SIZE - 1 && col == 0)
-    snake[0] -= SIZE;
-  else if (p_col == 0 && (col < 0 || col == SIZE - 1))
-    snake[0] += SIZE;
+  int row = (snake[0] - &area[0][0]) / COL,
+      col = (snake[0] - &area[0][0]) % COL;
+  int p_col = (past - &area[0][0]) % COL;
+  if (p_col == COL - 1 && col == 0)
+    snake[0] -= COL;
+  else if (p_col == 0 && (col < 0 || col == COL - 1))
+    snake[0] += COL;
   else {
     if (snake[0] < &area[0][0])
-      row = SIZE;
-    else if (row >= SIZE)
+      row = ROW;
+    else if (row >= ROW)
       row = 0;
 
     snake[0] = &area[row][col];
@@ -179,14 +158,16 @@ int check(char *past, int obs) {
     if (OBS[i] == snake[0])
       return -1;
   }
-  if (snake[0] == &area[pointr][pointc])
+  if (snake[0] == &area[pointr][pointc]) {
+    printf("\a");
     return 1;
+  }
   return 0;
 }
 
 void move(int eaten, char *past) {
   int i = 1;
-
+  //head design
   if (prev == 'd')
     (*snake[0]) = '>';
   else if (prev == 'a')
@@ -195,7 +176,7 @@ void move(int eaten, char *past) {
     (*snake[0]) = '^';
   else
     (*snake[0]) = '+';
-  //(*snake[0])='O';
+
   for (; i < snakelen; i++) {
     char *temp = snake[i];
 
@@ -203,6 +184,8 @@ void move(int eaten, char *past) {
     (*snake[i]) = snake_body;
     past = temp;
   }
+  if (snakelen > 1)
+    (*snake[i - 1]) = '*'; // tail design
   if (eaten) {
     ++snakelen;
     pointr = -1;
@@ -211,28 +194,44 @@ void move(int eaten, char *past) {
 }
 
 void print() {
-  int o = 0;
-  for (int r = 0; r < SIZE; r++) {
-    for (int c = 0; c < SIZE; c++) {
+  int obstacles = 0;
+  
+  for (int r = 0; r < ROW; r++) {
+    for (int c = 0; c < COL; c++) {
+      if(bgcolor)
+      printf("\033[48;5;155m");
+
+      
       for (int i = 0; i < num_of_obs; i++) {
         if (OBS[i] == &area[r][c]) {
-          printf("\033[45m\033[32m%c\033[0m", OBSTACLE);
-          o = 1;
+          
+          printf("\033[38;5;196m%c", OBSTACLE);
+          obstacles = 1;
           break;
         }
       }
-      if (o) {
-        o = 0;
+
+      if (obstacles) {
+        obstacles = 0;
+        
+        printf("\033[0m");
         continue;
       }
-      printf("\033[45m\033[32m%c\033[0m", area[r][c]);
+      printf("\033[30m%c", area[r][c]);  
+
+      printf("\033[0m");
     }
+    
     printf("\n");
   }
+ 
+  printf("\033[0m");
+ printf("Score: %d\n", snakelen - 1);
 }
 
-int main() {
 
+int main() {
+ start: 
   snake[0] = &area[0][0];
   memset(area, ' ', sizeof(area));
   printf("Level(1-10): ");
@@ -244,13 +243,16 @@ int main() {
   wait_time_ms *= (11 - level);
   printf("Do you want obstacles?(1/0): ");
   short int obs;
+  
   scanf("%hd", &obs);
   obstacle(obs);
+  printf("\033[?25l");//hide cursor
+  fflush(stdout);
   printf("Use w/a/s/d for controls\n");
   usleep(1000000);
   set_input_mode(1);
   srand(time(NULL));
-
+ 
   while (1) {
 
     print();
@@ -266,12 +268,46 @@ int main() {
   }
 
   set_input_mode(0);
-
+  
+  printf("\a\a\a");
+  usleep(1000000);
+  printf("\a\a\a");
+  usleep(1000000);
+  printf("\a\a\a");
+  
   system("clear");
   printf("\033[1mGAME OVER\033[0m\n");
 
   usleep(2000000);
+  
   printf("\nScore: %d\n", snakelen - 1);
-
+  usleep(500000);
+  printf("\033[?25h");//show cursor
+  
   return 0;
+  
+}
+void set_input_mode(int enabled) {
+  static struct termios oldt, newt;
+  if (enabled) {
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+  } else {
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  }
+}
+
+int getch() {
+  int ch;
+  ch = getchar();
+  return ch;
+}
+int kbhit() {
+  struct timeval tv = {0L, 0L};
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(STDIN_FILENO, &fds);
+  return select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
 }
