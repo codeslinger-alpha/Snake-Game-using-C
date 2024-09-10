@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,15 +7,16 @@
 #define bgcolor 1
 #define ROW 15
 #define COL 30
-int wait_time_ms = 100;
+int wait_time_ms=1000 ;//This is the maximum value
 int border_wall;
+char prev = 'd'; // primary direction of movement
 const char snake_body = '=', point = 'o', OBSTACLE = '#'; // Visuals
 
 
 char *OBS[ROW * COL];
 
 char area[ROW][COL];
-char prev = 'd'; // primary direction of movement
+
 char *snake[ROW * COL];
 int pointr = -1, pointc = -1;
 int snakelen = 1;
@@ -88,11 +88,14 @@ unpaused:
       ;
     goto unpaused;
   }
-  if (!ch || !(ch == 'd' || ch == 'a' || ch == 'w' || ch == 's'))
+  if (!ch || !(ch == 'd' || ch == 'a' || ch == 'w' || ch == 's' ||
+  ch == 'D' || ch == 'A' || ch == 'W' || ch == 'S'
+   ))
     ch = prev;
 
 chk:
   switch (ch) {
+  case 'D':
   case 'd': // right
     if (snakelen == 1 || (snake[0] + 1) != snake[1]) {
       snake[0]++;
@@ -102,6 +105,7 @@ chk:
       ch = prev;
       goto chk;
     }
+    case 'A':
   case 'a': // left
     if (snakelen == 1 || snake[0] - 1 != snake[1]) {
       snake[0]--;
@@ -111,7 +115,7 @@ chk:
       ch = prev;
       goto chk;
     }
-
+    case 'W':
   case 'w': // up
     if (snakelen == 1 || snake[0] - COL != snake[1]) {
       snake[0] -= COL;
@@ -121,7 +125,7 @@ chk:
       ch = prev;
       goto chk;
     }
-
+case 'S':
   case 's': // down
     if (snakelen == 1 || snake[0] + COL != snake[1]) {
       snake[0] += COL;
@@ -198,11 +202,11 @@ int check(char *past, int obs) {
 void move(int eaten, char *past) {
   int i = 1;
   // head design
-  if (prev == 'd')
+  if (prev == 'd' || prev == 'D')
     (*snake[0]) = '>';
-  else if (prev == 'a')
+  else if (prev == 'a' || prev == 'A'  )
     (*snake[0]) = '<';
-  else if (prev == 'w')
+  else if (prev == 'w' || prev == 'W')
     (*snake[0]) = '^';
   else
     (*snake[0]) = '+';
@@ -270,13 +274,12 @@ int main() {
 start:
   snake[0] = &area[0][0];
   memset(area, ' ', sizeof(area));
-  printf("Level(1-10): ");
+  printf("Level(1-100): ");
 
   unsigned short int level;
   scanf("%hu", &level);
-  if (level > 10)
-    level = 10;
-  wait_time_ms *= (11 - level);
+  
+  wait_time_ms/= level;
   printf("Do you want obstacles?(1/0): ");
   short int obs;
 
@@ -355,3 +358,4 @@ int kbhit() {
   FD_SET(STDIN_FILENO, &fds);
   return select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
 }
+    
