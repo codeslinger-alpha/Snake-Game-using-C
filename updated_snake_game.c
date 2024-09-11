@@ -1,3 +1,5 @@
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -67,13 +69,13 @@ char wait(int ms) {
   if (ms == -1) {
     return getch();
   }
-  int elps = 0;
+  float elps = 0;
   while (elps < ms) {
     if (kbhit())
       return getch();
     else
-      usleep(2000);
-    elps += 2;
+      usleep(20*ms);
+    elps += 0.02*ms;
   }
   return 0;
 }
@@ -271,7 +273,7 @@ void print() {
 }
 
 int main() {
-start:
+srand(time(NULL));
   snake[0] = &area[0][0];
   memset(area, ' ', sizeof(area));
   printf("Level(1-100): ");
@@ -293,7 +295,7 @@ start:
   printf("Use w/a/s/d for controls. Press <space> to pause/unpause\n");
   usleep(1000000);
   set_input_mode(1);
-  srand(time(NULL));
+  
   if (border_wall) {
     border_wall = 1;
     for (int i = 0; i < COL + 2; i++)
