@@ -1,5 +1,3 @@
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -99,7 +97,7 @@ chk:
   switch (ch) {
   case 'D':
   case 'd': // right
-    if (snakelen == 1 || (snake[0] + 1) != snake[1]) {
+    if (snakelen == 1 ||  (prev!='a' && prev!='A')) {
       snake[0]++;
       prev = ch;
       return snake[0] - 1;
@@ -109,7 +107,7 @@ chk:
     }
     case 'A':
   case 'a': // left
-    if (snakelen == 1 || snake[0] - 1 != snake[1]) {
+    if (snakelen == 1 ||  (prev!='d' && prev!='D')) {
       snake[0]--;
       prev = ch;
       return snake[0] + 1;
@@ -119,7 +117,7 @@ chk:
     }
     case 'W':
   case 'w': // up
-    if (snakelen == 1 || snake[0] - COL != snake[1]) {
+    if (snakelen == 1 || (prev!='s' && prev!='S')) {
       snake[0] -= COL;
       prev = ch;
       return snake[0] + COL;
@@ -129,7 +127,7 @@ chk:
     }
 case 'S':
   case 's': // down
-    if (snakelen == 1 || snake[0] + COL != snake[1]) {
+    if (snakelen == 1 ||  (prev!='w' && prev!= 'W')) {
       snake[0] += COL;
       prev = ch;
       return snake[0] - COL;
